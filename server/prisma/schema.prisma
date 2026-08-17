@@ -1,0 +1,213 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  username      String         @unique
+  email         String         @unique
+  password      String
+  avatar        String?
+  phone         String?
+  role          String         @default("USER") // ADMIN, USER
+  shareToken    String?        @unique
+  shareExpiresAt DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  events        Event[]
+  tasks         Task[]
+  notifications Notification[]
+  teamMembers      TeamMember[]
+  ownedTeams       Team[]         @relation("TeamOwner")
+  tags             Tag[]
+  comments         Comment[]
+  taskMembers      TaskMember[]
+  assignedSubtasks Subtask[]      @relation("SubtaskAssignee")
+  createdSubtasks  Subtask[]      @relation("SubtaskCreator")
+  activityLogs     ActivityLog[]
+  attachments      Attachment[]
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  color     String   @default("#3b82f6") // Default blue
+  userId    String?  // Null means system-wide category, otherwise user-specific
+  events    Event[]
+  tasks     Task[]
+}
+
+model Event {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  location    String?
+  priority    String     @default("MEDIUM") // LOW, MEDIUM, HIGH
+  categoryId  String?
+  category    Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  repeatRule  String?    // DAILY, WEEKLY, MONTHLY, YEARLY, NONE
+  color       String     @default("#3b82f6")
+  status      String     @default("CONFIRMED") // CONFIRMED, TENTATIVE, CANCELLED
+  reminders   Reminder[]
+  tags        Tag[]
+  attachments Attachment[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  deadline    DateTime?
+  priority    String       @default("MEDIUM") // LOW, MEDIUM, HIGH
+  status      String       @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  progress    Int          @default(0) // Percentage 0-100
+  categoryId  String?
+  category    Category?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  isPersonal  Boolean      @default(true)
+  subtasks    Subtask[]
+  tags        Tag[]
+  comments    Comment[]
+  members     TaskMember[]
+  attachments Attachment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model TaskMember {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   @default("VIEWER") // VIEWER, EDITOR
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, userId])
+}
+
+model Subtask {
+  id             String    @id @default(uuid())
+  taskId         String
+  task           Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  title          String
+  isCompleted    Boolean   @default(false)
+  assignedUserId String?
+  assignedUser   User?     @relation("SubtaskAssignee", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  createdById    String?
+  createdBy      User?     @relation("SubtaskCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  dueDate        DateTime?
+  createdAt      DateTime  @default(now())
+}
+
+model Reminder {
+  id            String   @id @default(uuid())
+  eventId       String
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  minutesBefore Int      @default(15)
+  type          String   @default("NOTIFICATION") // EMAIL, NOTIFICATION
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Team {
+  id        String       @id @default(uuid())
+  name      String
+  ownerId   String
+  owner     User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members   TeamMember[]
+  createdAt DateTime     @default(now())
+}
+
+model TeamMember {
+  id     String @id @default(uuid())
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   String @default("VIEWER") // OWNER, EDITOR, VIEWER
+
+  @@unique([teamId, userId])
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String
+  color     String   @default("#3b82f6")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  events    Event[]
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id        String       @id @default(uuid())
+  taskId    String
+  task      Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  attachments Attachment[]
+  createdAt DateTime     @default(now())
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId    String?
+  eventId   String?
+  action    String
+  details   String
+  createdAt DateTime @default(now())
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  fileName  String
+  filePath  String
+  fileSize  Int
+  mimeType  String
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  eventId   String?
+  event     Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Job {
+  id          String    @id @default(uuid())
+  type        String
+  payload     String
+  status      String    @default("PENDING")
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  error       String?
+  runAt       DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}

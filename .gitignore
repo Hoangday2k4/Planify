@@ -1,0 +1,38 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+web_packages/
+
+# Production build outputs
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# SQLite local databases
+*.db
+*.db-shm
+*.db-wal
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.system_generated/
+logs/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+.gemini/
+.agents/
+.DS_Store
+Thumbs.db
