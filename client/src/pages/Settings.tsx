@@ -41,6 +41,16 @@ const Settings: React.FC = () => {
   const [catLoading, setCatLoading] = useState(false);
   const [catMessage, setCatMessage] = useState<string | null>(null);
 
+  const getExportUrl = () => {
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const cleanBase = baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
+    return `${cleanBase}/public/calendar/export/${user?.id}`;
+  };
+
+  const getWebcalUrl = () => {
+    return getExportUrl().replace(/^https?:/, 'webcal:');
+  };
+
   // Cập nhật các state khi user context thay đổi
   useEffect(() => {
     if (user) {
@@ -572,12 +582,12 @@ const Settings: React.FC = () => {
                 <input
                   type="text"
                   readOnly
-                  value={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/public/calendar/export/${user?.id}`}
+                  value={getExportUrl()}
                   className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none dark:border-slate-800 dark:bg-slate-950/50 dark:text-white font-mono select-all"
                 />
                 <button
                   onClick={() => {
-                    const url = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/public/calendar/export/${user?.id}`;
+                    const url = getExportUrl();
                     navigator.clipboard.writeText(url);
                     alert('Đã sao chép liên kết iCalendar Feed!');
                   }}
@@ -591,7 +601,7 @@ const Settings: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
                 <a
                   href={`https://calendar.google.com/calendar/render?cid=${encodeURIComponent(
-                    `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/public/calendar/export/${user?.id}`
+                    getExportUrl()
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -601,14 +611,14 @@ const Settings: React.FC = () => {
                   Đồng bộ Google Calendar
                 </a>
                 <a
-                  href={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/^https?:/, 'webcal:')}/api/public/calendar/export/${user?.id}`}
+                  href={getWebcalUrl()}
                   className="flex items-center justify-center gap-1.5 rounded-xl bg-blue-50 hover:bg-blue-100/80 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 px-3 py-2.5 text-[11px] font-bold text-blue-600 dark:text-blue-400 transition shadow-sm border border-blue-100/50 dark:border-blue-900/30 text-center"
                 >
                   <Calendar size={13} className="shrink-0" />
                   Đăng ký Webcal
                 </a>
                 <a
-                  href={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/public/calendar/export/${user?.id}`}
+                  href={getExportUrl()}
                   download={`planify-calendar-${user?.username}.ics`}
                   className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-700 px-3 py-2.5 text-[11px] font-bold text-slate-700 dark:text-slate-300 transition shadow-sm border border-slate-200/50 dark:border-slate-850 text-center"
                 >
