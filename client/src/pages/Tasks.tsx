@@ -563,6 +563,10 @@ const Tasks: React.FC = () => {
   };
 
   const handleAssignSubtask = async (subtaskId: string, assignedUserId: string) => {
+    const confirmMessage = assignedUserId 
+      ? 'Bạn có chắc chắn muốn giao công việc con này cho thành viên đã chọn?'
+      : 'Bạn có chắc chắn muốn hủy giao công việc con này?';
+    if (!window.confirm(confirmMessage)) return;
     try {
       await api.patch(`/tasks/subtasks/${subtaskId}/toggle`, {
         assignedUserId: assignedUserId || null
@@ -596,6 +600,7 @@ const Tasks: React.FC = () => {
   };
 
   const handleToggleSubtask = async (subtaskId: string) => {
+    if (!window.confirm('Bạn có chắc chắn muốn thay đổi trạng thái hoàn thành của công việc con này?')) return;
     try {
       await api.patch(`/tasks/subtasks/${subtaskId}/toggle`);
       fetchData();
