@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap path
-Sitemap: https://planify-frontend-nine.vercel.app/sitemap.xml
+Sitemap: https://planify.com/sitemap.xml
