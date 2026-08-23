@@ -176,6 +176,7 @@ const Tasks: React.FC = () => {
 
   // Subtask input for existing task
   const [activeSubtaskInput, setActiveSubtaskInput] = useState<{ [key: string]: string }>({});
+  const [submittingSubtasks, setSubmittingSubtasks] = useState<Record<string, boolean>>({});
 
   // Excel Import States
   const [importExcelOpen, setImportExcelOpen] = useState(false);
@@ -605,18 +606,22 @@ const Tasks: React.FC = () => {
 
   const handleAddSubtaskToExisting = async (taskId: string) => {
     const title = activeSubtaskInput[taskId];
-    if (!title || !title.trim()) return;
+    if (!title || !title.trim() || submittingSubtasks[taskId]) return;
 
     try {
+      setSubmittingSubtasks(prev => ({ ...prev, [taskId]: true }));
       await api.post(`/tasks/${taskId}/subtasks`, { title: title.trim() });
       setActiveSubtaskInput({ ...activeSubtaskInput, [taskId]: '' });
-      fetchData();
+      await fetchData();
     } catch (err) {
       console.error('Lỗi thêm subtask:', err);
+    } finally {
+      setSubmittingSubtasks(prev => ({ ...prev, [taskId]: false }));
     }
   };
 
   const handleDeleteSubtask = async (subtaskId: string) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa công việc con này không?')) return;
     try {
       await api.delete(`/tasks/subtasks/${subtaskId}`);
       fetchData();
@@ -1040,8 +1045,9 @@ const Tasks: React.FC = () => {
                               <div className="flex gap-2.5 pt-2 max-w-md">
                                 <input
                                   type="text"
-                                  placeholder="Thêm việc cần làm..."
-                                  className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs outline-none transition focus:border-blue-500 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                                  placeholder={submittingSubtasks[task.id] ? "Đang thêm..." : "Thêm việc cần làm..."}
+                                  disabled={submittingSubtasks[task.id]}
+                                  className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs outline-none transition focus:border-blue-500 dark:border-slate-800 dark:bg-slate-900 dark:text-white disabled:opacity-50"
                                   value={activeSubtaskInput[task.id] || ''}
                                   onChange={(e) => setActiveSubtaskInput({ ...activeSubtaskInput, [task.id]: e.target.value })}
                                   onKeyDown={(e) => {
@@ -1050,9 +1056,17 @@ const Tasks: React.FC = () => {
                                 />
                                 <button
                                   onClick={() => handleAddSubtaskToExisting(task.id)}
-                                  className="rounded-2xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/10 transition"
+                                  disabled={submittingSubtasks[task.id]}
+                                  className="rounded-2xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/10 transition disabled:opacity-50 flex items-center gap-1.5"
                                 >
-                                  Thêm
+                                  {submittingSubtasks[task.id] ? (
+                                    <>
+                                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                      Đang thêm...
+                                    </>
+                                  ) : (
+                                    'Thêm'
+                                  )}
                                 </button>
                               </div>
                             )}
