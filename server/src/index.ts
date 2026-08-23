@@ -23,6 +23,7 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'https://planify-frontend-nine.vercel.app',
     ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
   ],
   credentials: true
