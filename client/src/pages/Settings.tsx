@@ -222,6 +222,23 @@ const Settings: React.FC = () => {
     }
   };
 
+  const handleDeleteCategory = async (id: string) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa danh mục này? Tất cả các công việc và sự kiện thuộc danh mục này sẽ chuyển sang không có danh mục.')) return;
+    
+    setCatLoading(true);
+    setCatMessage(null);
+    try {
+      await api.delete(`/categories/${id}`);
+      setCatMessage('Xóa danh mục thành công!');
+      fetchCategories();
+    } catch (err: any) {
+      console.error('Lỗi xóa danh mục:', err);
+      setCatMessage(err.response?.data?.message || 'Không thể xóa danh mục.');
+    } finally {
+      setCatLoading(false);
+    }
+  };
+
   const presetColors = [
     '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#6366f1',
   ];
@@ -552,12 +569,27 @@ const Settings: React.FC = () => {
                 {categories.map((c) => (
                   <div
                     key={c.id}
-                    className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-bold text-white shadow-sm"
+                    className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-bold text-white shadow-sm select-none"
                     style={{ backgroundColor: c.color }}
                   >
                     <span>{c.name}</span>
-                    {c.userId && (
-                      <span className="text-[9px] rounded bg-white/20 px-1 py-0.25 font-medium">Cá nhân</span>
+                    {c.userId ? (
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[8px] rounded bg-white/20 px-1 py-0.25 font-medium shrink-0">Cá nhân</span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteCategory(c.id);
+                          }}
+                          className="rounded-full bg-white/15 hover:bg-white/30 p-0.5 transition cursor-pointer shrink-0"
+                          title="Xóa danh mục"
+                        >
+                          <X size={9} className="text-white" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-[8px] rounded bg-white/20 px-1 py-0.25 font-medium shrink-0">Hệ thống</span>
                     )}
                   </div>
                 ))}
