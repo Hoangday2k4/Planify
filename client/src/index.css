@@ -44,6 +44,13 @@
     border-color: #3b82f6 !important;
     color: #ffffff !important;
   }
+
+  /* Làm cho icon chọn ngày (calendar picker) có màu sáng trong dark mode */
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.95);
+    cursor: pointer;
+  }
 }
 
 /* --- Aurora Background Effect --- */
