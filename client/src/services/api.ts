@@ -8,6 +8,8 @@ const api = axios.create({
   },
 });
 
+console.log('Planify API Base URL:', api.defaults.baseURL);
+
 // Interceptor đính kèm token tự động vào header
 api.interceptors.request.use(
   (config) => {
