@@ -810,7 +810,11 @@ const Tasks: React.FC = () => {
                 <div 
                   key={task.id} 
                   id={`task-card-${task.id}`}
-                  className={`glass-card hover-lift rounded-3xl overflow-hidden ${isExpanded ? 'ring-2 ring-blue-500/30' : ''}`}
+                  className={`glass-card hover-lift rounded-3xl overflow-hidden transition-all duration-300 ${
+                    isExpanded 
+                      ? 'border-l-4 border-l-blue-500 dark:border-l-blue-400 bg-blue-50/15 dark:bg-blue-950/10 shadow-lg shadow-blue-500/5 ring-1 ring-blue-500/25' 
+                      : ''
+                  }`}
                 >
                   <div 
                     className="flex flex-col md:flex-row md:items-center justify-between p-5 gap-4 cursor-pointer select-none"
