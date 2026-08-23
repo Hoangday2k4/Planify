@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap path
+Sitemap: https://planify-client.vercel.app/sitemap.xml
