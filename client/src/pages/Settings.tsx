@@ -573,23 +573,18 @@ const Settings: React.FC = () => {
                     style={{ backgroundColor: c.color }}
                   >
                     <span>{c.name}</span>
-                    {c.userId ? (
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[8px] rounded bg-white/20 px-1 py-0.25 font-medium shrink-0">Cá nhân</span>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteCategory(c.id);
-                          }}
-                          className="rounded-full bg-white/15 hover:bg-white/30 p-0.5 transition cursor-pointer shrink-0"
-                          title="Xóa danh mục"
-                        >
-                          <X size={9} className="text-white" />
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="text-[8px] rounded bg-white/20 px-1 py-0.25 font-medium shrink-0">Hệ thống</span>
+                    {c.userId && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteCategory(c.id);
+                        }}
+                        className="rounded-full bg-white/15 hover:bg-white/30 p-0.5 transition cursor-pointer shrink-0"
+                        title="Xóa danh mục"
+                      >
+                        <X size={9} className="text-white" />
+                      </button>
                     )}
                   </div>
                 ))}
