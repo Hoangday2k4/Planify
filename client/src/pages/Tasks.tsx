@@ -590,6 +590,15 @@ const Tasks: React.FC = () => {
   };
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
+    if (newStatus === 'COMPLETED') {
+      if (!window.confirm('Bạn có chắc chắn muốn đánh dấu hoàn thành công việc này?')) return;
+    } else if (task.status === 'COMPLETED' && newStatus !== 'COMPLETED') {
+      if (!window.confirm('Bạn có chắc chắn muốn mở lại công việc này?')) return;
+    }
+
     try {
       await api.put(`/tasks/${id}`, { status: newStatus });
       fetchData();
