@@ -31,8 +31,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
+      const storedToken = sessionStorage.getItem('token');
+      const storedUser = sessionStorage.getItem('user');
 
       if (storedToken && storedUser) {
         setToken(storedToken);
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const res = await api.get('/auth/me');
           setUser(res.data.user);
-          localStorage.setItem('user', JSON.stringify(res.data.user));
+          sessionStorage.setItem('user', JSON.stringify(res.data.user));
         } catch (err) {
           console.error('Không thể đồng bộ thông tin user từ server', err);
         }
@@ -60,8 +60,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setToken(receivedToken);
       setUser(receivedUser);
-      localStorage.setItem('token', receivedToken);
-      localStorage.setItem('user', JSON.stringify(receivedUser));
+      sessionStorage.setItem('token', receivedToken);
+      sessionStorage.setItem('user', JSON.stringify(receivedUser));
     } catch (err: any) {
       console.error('Lỗi API Login:', err);
       const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Đăng nhập thất bại.';
@@ -79,8 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setToken(receivedToken);
       setUser(receivedUser);
-      localStorage.setItem('token', receivedToken);
-      localStorage.setItem('user', JSON.stringify(receivedUser));
+      sessionStorage.setItem('token', receivedToken);
+      sessionStorage.setItem('user', JSON.stringify(receivedUser));
     } catch (err: any) {
       console.error('Lỗi API Register:', err);
       const msg = err.response?.data?.message || err.response?.data?.error || err.message || 'Đăng ký thất bại.';
@@ -93,19 +93,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
   };
 
   const updateUserLocal = (updatedUser: Partial<User>, newToken?: string) => {
     if (user) {
       const newUserData = { ...user, ...updatedUser };
       setUser(newUserData);
-      localStorage.setItem('user', JSON.stringify(newUserData));
+      sessionStorage.setItem('user', JSON.stringify(newUserData));
     }
     if (newToken) {
       setToken(newToken);
-      localStorage.setItem('token', newToken);
+      sessionStorage.setItem('token', newToken);
     }
   };
 
