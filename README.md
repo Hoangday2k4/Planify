@@ -4,6 +4,8 @@
 [![Database](https://img.shields.io/badge/database-PostgreSQL-blue.svg)](https://www.postgresql.org)
 [![Frontend](https://img.shields.io/badge/frontend-React%20%2B%20Vite%20%2B%20Tailwind-teal.svg)](https://react.dev)
 
+🔗 **Website chính thức:** [https://planify-frontend-nine.vercel.app](https://planify-frontend-nine.vercel.app)
+
 **Planify** là một ứng dụng web giúp quản lý công việc và lịch biểu cá nhân/nhóm một cách trực quan, tối giản nhưng vô cùng mạnh mẽ. Dự án được tối ưu hóa khả năng chịu tải lớn và xử lý tác vụ bất đồng bộ thông qua các luồng chạy ngầm (background queue worker).
 
 ## 🚀 Các Tính Năng Nổi Bật
